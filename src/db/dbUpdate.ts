@@ -1,14 +1,22 @@
 import { db } from "@/lib/db";
-import { id } from "@instantdb/react";
 
-type PatientHistoryT = {
-  email: string;
-  createdAt: Date;
+type HealthCardT = {
+  patientId?: string;
+  cardNumber?: string;
+  medicalCardCreationDate?: Date;
+  clinicHospitalName?: string;
+  location?: string;
+  responsibleDoctorFullName?: string;
+  hospitalizationDateTime?: Date;
+  referralSource?: string;
+  chiefComplaints?: string;
+  finalClinicalDiagnosisMain?: string;
+  doctorNotes?: string[];
 };
 
-export const updatePatientHistory = (info: PatientHistoryT) => {
+export const updateHealthCard = (id: string, info: HealthCardT) => {
   db.transact(
-    db.tx.$patientsHistory[id()].update({
+    db.tx.healthCard[id].update({
       ...info,
     })
   );

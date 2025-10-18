@@ -4,38 +4,55 @@ import { i } from "@instantdb/react";
 
 const _schema = i.schema({
   entities: {
-    $patients: i.entity({
+    patients: i.entity({
       personalId: i.string().unique().indexed(),
       name: i.string(),
       lastName: i.string(),
-      phoneNumber: i.string(),
+      age: i.number(),
       sex: i.string(),
+      height: i.number(),
+      weight: i.number(),
+      martialStatus: i.string(),
+      phoneNumber: i.string(),
       dateOfBirth: i.date(),
-      bloodType: i.string(),
-      createdAt: i.date(),
     }),
-    $patientsHistory: i.entity({
-      email: i.string().unique().indexed().optional(),
-      createdAt: i.date(),
+    healthCard: i.entity({
+      patientId: i.string().unique().indexed(),
+      cardNumber: i.string().unique().indexed(),
+      medicalCardCreationDate: i.date(),
+      // Hospital Visit
+      clinicHospitalName: i.string(),
+      location: i.string(),
+      responsibleDoctorFullName: i.string(),
+      hospitalizationDateTime: i.date(),
+      referralSource: i.string(), // "Emergency", "Outpatient", "Referral", etc.
+      // Chief Complaints & Diagnosis
+      chiefComplaints: i.string(),
+      finalClinicalDiagnosisMain: i.string(),
+      // Doctor's Notes (Optional)
+      doctorNotes: i.json().optional(),
     }),
   },
   links: {
     $usersLinkedPrimaryUser: {
       forward: {
-        on: "$patients",
+        on: "patients",
         has: "one",
         label: "linkedPrimaryUser",
         onDelete: "cascade",
       },
       reverse: {
-        on: "$patients",
+        on: "patients",
         has: "many",
         label: "linkedGuestUsers",
       },
     },
   },
   rooms: {
-    $patientsHistory: {
+    patients: {
+      presence: i.entity({}),
+    },
+    healthCard: {
       presence: i.entity({}),
     },
   },

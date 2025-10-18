@@ -1,22 +1,40 @@
 import { db } from "@/lib/db";
 
-type TRoomNameSpace = "$patientsHistory";
+type TRoomNameSpace = "healthCard" | "patients";
 
-type readDataT = {
-  roomNameSpace: TRoomNameSpace;
-  query: Record<TRoomNameSpace, {}>;
+type readDataT<T extends TRoomNameSpace> = {
+  roomNameSpace: T;
+  query: Record<T, {}>;
 };
 
-export const readData = ({ roomNameSpace, query }: readDataT) => {
+export const readData = <T extends TRoomNameSpace>({
+  roomNameSpace,
+  query,
+}: readDataT<T>) => {
   const room = db.room(roomNameSpace);
 
-  const { isLoading, error, data } = db.useQuery(query);
+  // Adjust query to match the expected shape for db.useQuery
+  const queryParam =
+    roomNameSpace === "patients"
+      ? { patients: query[roomNameSpace] }
+      : roomNameSpace === "healthCard"
+      ? { healthCard: query[roomNameSpace] }
+      : {};
+
+  const { isLoading, error, data } = db.useQuery(queryParam);
   const { peers } = db.rooms.usePresence(room);
 
+  const result =
+    data && roomNameSpace in data
+      ? (data as Record<string, unknown>)[roomNameSpace]
+      : null;
+
   return {
-    patientsHistory: data?.$patientsHistory ?? null,
+    result,
     peers,
     isLoading,
     error: error?.message ?? null,
   };
 };
+
+// export const readPatientHistoryData = () => {};
