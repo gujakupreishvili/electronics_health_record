@@ -1,4 +1,6 @@
 import Button from "@/components/button/button";
+import Link from "next/link";
+
 import React from "react";
 
 export default function Header() {
@@ -8,10 +10,13 @@ export default function Header() {
         <div className="w-[30px] h-[30px] rounded-[10px] bg-blue-300 mr-[10px]"></div>
         <h1>HealthCare</h1>
       </div>
+      <Link href ="/auth/signIn"
+      >
       <Button
         className="w-[60px] h-[40px] bg-blue-400 rounded-[10px] text-[14px] text-white font-poppins font-normal"
         text="Sign in "
       />
+      </Link>
     </div>
   );
 }
