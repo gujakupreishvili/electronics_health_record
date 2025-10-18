@@ -20,17 +20,25 @@ const _schema = i.schema({
       patientId: i.string().unique().indexed(),
       cardNumber: i.string().unique().indexed(),
       medicalCardCreationDate: i.date(),
-      // Hospital Visit
       clinicHospitalName: i.string(),
       location: i.string(),
       responsibleDoctorFullName: i.string(),
       hospitalizationDateTime: i.date(),
-      referralSource: i.string(), // "Emergency", "Outpatient", "Referral", etc.
-      // Chief Complaints & Diagnosis
+      referralSource: i.string(), //saidan shemoiyvanes pacienti,emergencydan quchidan tu sidan
+      //chivilebi da diagnozi
       chiefComplaints: i.string(),
       finalClinicalDiagnosisMain: i.string(),
-      // Doctor's Notes (Optional)
+      // eqimis notebi
       doctorNotes: i.json().optional(),
+    }),
+
+    hospitals: i.entity({
+      hospitalId: i.string().unique().indexed(),
+      hospitalName: i.string().unique().indexed(),
+      location: i.string(), // sruli misamarti
+      city: i.string(), // qalaqi
+      phoneNumber: i.string(),
+      email: i.string(),
     }),
   },
   links: {
