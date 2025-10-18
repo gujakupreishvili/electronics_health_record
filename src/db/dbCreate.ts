@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { id } from "@instantdb/react";
 
 type CreateUserT = {
-  role: "admin" | "patient" | "gov";
   fullName: string;
   personalId: string;
   age: number;
@@ -17,7 +16,6 @@ type CreateUserT = {
 };
 
 export const dbCreatePatient = async ({
-  role,
   fullName,
   personalId,
   age,
@@ -32,7 +30,6 @@ export const dbCreatePatient = async ({
 }: CreateUserT) => {
   db.transact(
     db.tx.patients[id()].create({
-      role,
       fullName,
       personalId,
       age,
@@ -60,6 +57,8 @@ type HealthCardT = {
   chiefComplaints: string;
   finalClinicalDiagnosisMain: string;
   doctorNotes: string[];
+  createdByDoctorId: string;
+  createdByHospitalId: string;
 };
 
 export const dbCreateHealthCard = (info: HealthCardT) => {
@@ -75,6 +74,8 @@ export const dbCreateHealthCard = (info: HealthCardT) => {
     chiefComplaints,
     finalClinicalDiagnosisMain,
     doctorNotes,
+    createdByDoctorId,
+    createdByHospitalId,
   } = info;
 
   // Ensure required fields are present and default to empty string if undefined
@@ -88,7 +89,9 @@ export const dbCreateHealthCard = (info: HealthCardT) => {
     !hospitalizationDateTime ||
     !referralSource ||
     !chiefComplaints ||
-    !finalClinicalDiagnosisMain
+    !finalClinicalDiagnosisMain ||
+    !createdByDoctorId ||
+    !createdByHospitalId
   ) {
     console.error("");
     return;
@@ -107,6 +110,26 @@ export const dbCreateHealthCard = (info: HealthCardT) => {
       chiefComplaints: chiefComplaints,
       finalClinicalDiagnosisMain: finalClinicalDiagnosisMain,
       doctorNotes: doctorNotes ?? [],
+      createdByDoctorId,
+      createdByHospitalId,
     })
   );
+};
+
+type CreateDoctorT = {
+  doctorId: string;
+  fullName: string;
+  specialty: string;
+  email: string;
+  phoneNumber: string;
+  hospitalId: string;
+  createdAt: Date;
+};
+
+export const createDoctor = (info: CreateDoctorT) => {
+  try {
+    db.transact(db.tx.doctors[id()].create(info));
+  } catch (error) {
+    console.error(error);
+  }
 };

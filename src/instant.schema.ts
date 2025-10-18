@@ -24,7 +24,7 @@ const _schema = i.schema({
     }),
     patients: i.entity({
       personalId: i.string().unique().indexed(),
-      fullname: i.string(),
+      fullName: i.string(),
       age: i.number(),
       sex: i.string(),
       height: i.number(),

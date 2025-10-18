@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 
-type TRoomNameSpace = "healthCard" | "patients";
+type TRoomNameSpace = "healthCard" | "patients" | "doctors";
 
 type readDataT<T extends TRoomNameSpace> = {
   roomNameSpace: T;
@@ -18,6 +18,8 @@ export const readData = <T extends TRoomNameSpace>({
     roomNameSpace === "patients"
       ? { patients: query[roomNameSpace] }
       : roomNameSpace === "healthCard"
+      ? { healthCard: query[roomNameSpace] }
+      : roomNameSpace === "doctors"
       ? { healthCard: query[roomNameSpace] }
       : {};
 

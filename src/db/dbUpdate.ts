@@ -14,12 +14,12 @@ type HealthCardT = {
   chiefComplaints?: string;
   finalClinicalDiagnosisMain?: string;
   doctorNotes?: string[];
-  auditTrail?: string[];
 };
 
 export const updateHealthCard = async (id: string, info: HealthCardT) => {
   try {
     if (!id) return;
+
     await db.transact(
       db.tx.healthCard[id].update({
         ...info,
@@ -33,6 +33,7 @@ export const updateHealthCard = async (id: string, info: HealthCardT) => {
 export const updatePatientInformation = async (id: string, info: any) => {
   try {
     if (!id) return;
+
     await db.transact(
       db.tx.patients[id].update({
         ...info,
@@ -46,6 +47,7 @@ export const updatePatientInformation = async (id: string, info: any) => {
 export const updateDoctorInformation = async (id: string, info: any) => {
   try {
     if (!id) return;
+    
     await db.transact(
       db.tx.doctors[id].update({
         ...info,
