@@ -1,7 +1,11 @@
-import Image from "next/image";
+import Header from "@/components/header/header";
+import Main from "@/components/main/main";
 
 export default function Home() {
   return (
-    <h1>hello world</h1>
+    <>
+      <Header />
+      <Main />
+    </>
   );
 }
