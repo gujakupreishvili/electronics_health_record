@@ -43,7 +43,7 @@ export default function Main() {
                 <Users className="h-8 w-8 text-blue-500" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
-                მომხმარებელთა ინფორმაცია
+                მომხმარებელთა მონაცემებზე წვდომა 
               </h3>
             </div>
           </div>
