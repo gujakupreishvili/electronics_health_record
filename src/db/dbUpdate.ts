@@ -1,13 +1,22 @@
 import { db } from "@/lib/db";
 
 type PatientHistoryT = {
-  email: string;
-  createdAt: any;
+  patientId: string;
+  cardNumber: string;
+  medicalCardCreationDate: Date;
+  clinicHospitalName: string;
+  location: string;
+  responsibleDoctorFullName: string;
+  hospitalizationDateTime: Date;
+  referralSource: string;
+  chiefComplaints: string;
+  finalClinicalDiagnosisMain: string;
+  doctorNotes: string[];
 };
 
 export const updatePatientHistory = (id: string, info: PatientHistoryT) => {
   db.transact(
-    db.tx.patientsHistory[id].update({
+    db.tx.healthCard[id].update({
       ...info,
     })
   );

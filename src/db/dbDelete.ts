@@ -5,5 +5,5 @@ export const deletePatient = (id: string) => {
 };
 
 export const deletePatientHistoryItem = (id: string) => {
-  db.transact(db.tx.patientsHistory[id].delete());
+  db.transact(db.tx.healthCard[id].delete());
 };

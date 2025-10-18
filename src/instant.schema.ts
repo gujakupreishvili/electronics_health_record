@@ -16,7 +16,7 @@ const _schema = i.schema({
       phoneNumber: i.string(),
       dateOfBirth: i.date(),
     }),
-    patientsHistory: i.entity({
+    healthCard: i.entity({
       patientId: i.string().unique().indexed(),
       cardNumber: i.string().unique().indexed(),
       medicalCardCreationDate: i.date(),
@@ -52,7 +52,7 @@ const _schema = i.schema({
     patients: {
       presence: i.entity({}),
     },
-    patientsHistory: {
+    healthCard: {
       presence: i.entity({}),
     },
   },
