@@ -7,7 +7,7 @@ type readDataT<T extends TRoomNameSpace> = {
   query: Record<T, {}>;
 };
 
-export const readData = <T extends TRoomNameSpace>({
+export const useDbRead = <T extends TRoomNameSpace>({
   roomNameSpace,
   query,
 }: readDataT<T>) => {
@@ -20,8 +20,9 @@ export const readData = <T extends TRoomNameSpace>({
       : roomNameSpace === "healthCard"
       ? { healthCard: query[roomNameSpace] }
       : roomNameSpace === "doctors"
-      ? { healthCard: query[roomNameSpace] }
+      ? { doctors: query[roomNameSpace] }
       : {};
+
 
   const { isLoading, error, data } = db.useQuery(queryParam);
   const { peers } = db.rooms.usePresence(room);
@@ -38,5 +39,3 @@ export const readData = <T extends TRoomNameSpace>({
     error: error?.message ?? null,
   };
 };
-
-// export const readPatientHistoryData = () => {};

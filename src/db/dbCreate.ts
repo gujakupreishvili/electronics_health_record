@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { id } from "@instantdb/react";
+import bcrypt from "bcryptjs";
 
 type CreateUserT = {
   fullName: string;
@@ -129,7 +130,10 @@ type CreateDoctorT = {
 
 export const dbCreateDoctor = async (info: CreateDoctorT) => {
   try {
-    db.transact(db.tx.doctors[id()].create(info));
+    const hashedPassword = await bcrypt.hash(info.password, 10);
+    db.transact(
+      db.tx.doctors[id()].create({ ...info, password: hashedPassword })
+    );
   } catch (error) {
     console.error(error, "error when creating Doctor");
   }

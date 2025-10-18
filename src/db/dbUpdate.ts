@@ -1,22 +1,11 @@
+import { AppSchema } from "@/instant.schema";
 import { db } from "@/lib/db";
+import { UpdateParams } from "@instantdb/react";
 
-type HealthCardT = {
-  patientId?: string;
-  cardNumber?: string;
-  medicalCardCreationDate?: Date;
-  createdByDoctorId?: string;
-  createdByHospitalId?: string;
-  clinicHospitalName?: string;
-  location?: string;
-  responsibleDoctorFullName?: string;
-  hospitalizationDateTime?: Date;
-  referralSource?: string;
-  chiefComplaints?: string;
-  finalClinicalDiagnosisMain?: string;
-  doctorNotes?: string[];
-};
-
-export const updateHealthCard = async (id: string, info: HealthCardT) => {
+export const updateHealthCard = async (
+  id: string,
+  info: UpdateParams<AppSchema, "healthCard">
+) => {
   try {
     if (!id) return;
 
@@ -30,7 +19,10 @@ export const updateHealthCard = async (id: string, info: HealthCardT) => {
   }
 };
 
-export const updatePatientInformation = async (id: string, info: any) => {
+export const updatePatientInformation = async (
+  id: string,
+  info: UpdateParams<AppSchema, "patients">
+) => {
   try {
     if (!id) return;
 
@@ -44,7 +36,10 @@ export const updatePatientInformation = async (id: string, info: any) => {
   }
 };
 
-export const updateDoctorInformation = async (id: string, info: any) => {
+export const updateDoctorInformation = async (
+  id: string,
+  info: UpdateParams<AppSchema, "doctors">
+) => {
   try {
     if (!id) return;
 

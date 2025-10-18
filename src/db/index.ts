@@ -3,7 +3,7 @@ import {
   updateDoctorInformation,
   updatePatientInformation,
 } from "./dbUpdate";
-import { readData } from "./dbRead";
+import { useDbRead } from "./useDbRead";
 import {
   dbDeleteDoctor,
   dbDeletePatientHistoryItem,
@@ -14,10 +14,11 @@ import {
   dbCreateHealthCard,
   dbCreatePatient,
 } from "./dbCreate";
+import { useDbCheckUserCredentials } from "./useDbCheckUserCredentials";
 
 export {
   updateHealthCard,
-  readData,
+  useDbRead,
   dbDeleteDoctor,
   dbDeletePatientHistoryItem,
   dbDeletePatient,
@@ -26,4 +27,5 @@ export {
   dbCreateDoctor,
   dbCreateHealthCard,
   dbCreatePatient,
+  useDbCheckUserCredentials,
 };
