@@ -38,7 +38,7 @@ export default function Auth() {
       };
 
       // const res = await axios.post("/api/login", payload);
-      console.log(values,"values")
+      console.log(values, "values");
       console.log("რეგისტრაცია წარმატებით:", payload);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -111,58 +111,52 @@ export default function Auth() {
               iconStyle="text-blue-500 text-[18px]"
             />
           </div>
-
           {/* Form Section */}
           <Formik
             initialValues={initialValues}
             validationSchema={SignInValidationSchema}
             onSubmit={handleSubmit}
           >
-            {({ errors, touched, handleChange, handleBlur, values }) => (
-              <Form
-                className="
-            flex flex-col gap-[12px] 
-            w-full md:w-[45%] 
-            border border-gray-200 rounded-[8px] p-[20px]
-            shadow-sm bg-white
-          "
-              >
-                <h1 className="text-xl font-bold">ავტორიზაცია</h1>
-                <p className="text-gray-600 text-sm">
-                  შეიყვანეთ თქვენი მონაცემები
+            <Form
+              className="
+                flex flex-col gap-[12px] 
+                w-full md:w-[45%] 
+                border border-gray-200 rounded-[8px] p-[20px]
+                shadow-sm bg-white
+              "
+            >
+              <h1 className="text-xl font-bold">ავტორიზაცია</h1>
+              <p className="text-gray-600 text-sm">
+                შეიყვანეთ თქვენი მონაცემები
+              </p>
+
+              <Input
+                label="ელფოსტა"
+                name="email"
+                type="email"
+                placeholder="ელფოსტა"
+              />
+
+              <Input
+                label="პაროლი"
+                name="password"
+                type="password"
+                placeholder="პაროლი"
+              />
+
+              {serverError && (
+                <p className="text-red-500 text-sm font-poppins">
+                  {serverError}
                 </p>
+              )}
 
-                <Input
-                  label="ელფოსტა"
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                />
-
-                <Input
-                  label="პაროლი"
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                />
-                {errors.password && touched.password && (
-                  <p className="text-red-500 text-sm">{errors.password}</p>
-                )}
-
-                {serverError && (
-                  <p className="text-red-500 text-sm font-poppins">
-                    {serverError}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white font-semibold py-[10px] rounded-[6px] hover:bg-blue-600 transition-colors"
-                >
-                  ავტორიზაცია
-                </button>
-              </Form>
-            )}
+              <button
+                type="submit"
+                className="bg-blue-500 text-white font-semibold py-[10px] rounded-[6px] hover:bg-blue-600 transition-colors"
+              >
+                ავტორიზაცია
+              </button>
+            </Form>
           </Formik>
         </div>
       </div>
