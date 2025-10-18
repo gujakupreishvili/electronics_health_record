@@ -4,7 +4,7 @@ import { i } from "@instantdb/react";
 
 const _schema = i.schema({
   entities: {
-    $patients: i.entity({
+    patients: i.entity({
       personalId: i.string().unique().indexed(),
       name: i.string(),
       lastName: i.string(),
@@ -14,7 +14,7 @@ const _schema = i.schema({
       bloodType: i.string(),
       createdAt: i.date(),
     }),
-    $patientsHistory: i.entity({
+    patientsHistory: i.entity({
       email: i.string().unique().indexed().optional(),
       createdAt: i.date(),
     }),
@@ -22,20 +22,23 @@ const _schema = i.schema({
   links: {
     $usersLinkedPrimaryUser: {
       forward: {
-        on: "$patients",
+        on: "patients",
         has: "one",
         label: "linkedPrimaryUser",
         onDelete: "cascade",
       },
       reverse: {
-        on: "$patients",
+        on: "patients",
         has: "many",
         label: "linkedGuestUsers",
       },
     },
   },
   rooms: {
-    $patientsHistory: {
+    patients: {
+      presence: i.entity({}),
+    },
+    patientsHistory: {
       presence: i.entity({}),
     },
   },
