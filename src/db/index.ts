@@ -1,10 +1,5 @@
-import { updatePatientHistory } from "./dbUpdate";
+import { updateHealthCard } from "./dbUpdate";
 import { readData } from "./dbRead";
 import { deletePatient, deletePatientHistoryItem } from "./dbDelete";
 
-export {
-  updatePatientHistory,
-  readData,
-  deletePatient,
-  deletePatientHistoryItem,
-};
+export { updateHealthCard, readData, deletePatient, deletePatientHistoryItem };
