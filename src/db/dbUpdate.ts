@@ -14,10 +14,41 @@ type HealthCardT = {
   doctorNotes?: string[];
 };
 
-export const updateHealthCard = (id: string, info: HealthCardT) => {
-  db.transact(
-    db.tx.healthCard[id].update({
-      ...info,
-    })
-  );
+export const updateHealthCard = async (id: string, info: HealthCardT) => {
+  try {
+    if (!id) return;
+    await db.transact(
+      db.tx.healthCard[id].update({
+        ...info,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updatePatientInformation = async (id: string, info: any) => {
+  try {
+    if (!id) return;
+    await db.transact(
+      db.tx.patients[id].update({
+        ...info,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updateDoctorInformation = async (id: string, info: any) => {
+  try {
+    if (!id) return;
+    await db.transact(
+      db.tx.doctors[id].update({
+        ...info,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+  }
 };
