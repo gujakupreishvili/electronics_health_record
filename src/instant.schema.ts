@@ -4,10 +4,27 @@ import { i } from "@instantdb/react";
 
 const _schema = i.schema({
   entities: {
+    hospitals: i.entity({
+      hospitalId: i.string().unique().indexed(),
+      hospitalName: i.string().unique().indexed(),
+      location: i.string(),
+      city: i.string(),
+      phoneNumber: i.string(),
+      email: i.string(),
+      createdAt: i.date(),
+    }),
+    doctors: i.entity({
+      doctorId: i.string().unique().indexed(),
+      fullName: i.string(),
+      specialty: i.string(),
+      email: i.string().unique().indexed(),
+      phoneNumber: i.string(),
+      hospitalId: i.string().indexed(),
+      createdAt: i.date(),
+    }),
     patients: i.entity({
       personalId: i.string().unique().indexed(),
-      name: i.string(),
-      lastName: i.string(),
+      fullname: i.string(),
       age: i.number(),
       sex: i.string(),
       height: i.number(),
@@ -15,44 +32,66 @@ const _schema = i.schema({
       martialStatus: i.string(),
       phoneNumber: i.string(),
       dateOfBirth: i.date(),
+      createdByDoctorId: i.string().indexed(),
+      createdAt: i.date(),
     }),
     healthCard: i.entity({
       patientId: i.string().unique().indexed(),
       cardNumber: i.string().unique().indexed(),
       medicalCardCreationDate: i.date(),
+      createdByDoctorId: i.string().indexed(),
+      createdByHospitalId: i.string().indexed(),
       clinicHospitalName: i.string(),
       location: i.string(),
       responsibleDoctorFullName: i.string(),
       hospitalizationDateTime: i.date(),
-      referralSource: i.string(), //saidan shemoiyvanes pacienti,emergencydan quchidan tu sidan
-      //chivilebi da diagnozi
+      referralSource: i.string(),
       chiefComplaints: i.string(),
       finalClinicalDiagnosisMain: i.string(),
-      // eqimis notebi
-      doctorNotes: i.json().optional(),
-    }),
-
-    hospitals: i.entity({
-      hospitalId: i.string().unique().indexed(),
-      hospitalName: i.string().unique().indexed(),
-      location: i.string(), // sruli misamarti
-      city: i.string(), // qalaqi
-      phoneNumber: i.string(),
-      email: i.string(),
+      doctorNotes: i.json().optional(), // [{doctorId, doctorName, hospitalId, hospitalName, note, date}]
+      auditTrail: i.json().optional(), // [{doctorId, hospitalId, action, date, changedFields}]
     }),
   },
   links: {
-    $usersLinkedPrimaryUser: {
+    // one hospital has many doctors
+    hospitalDoctors: {
       forward: {
-        on: "patients",
-        has: "one",
-        label: "linkedPrimaryUser",
+        on: "hospitals",
+        has: "many",
+        label: "doctors",
         onDelete: "cascade",
       },
       reverse: {
-        on: "patients",
+        on: "doctors",
+        has: "one",
+        label: "hospital",
+      },
+    },
+    // doctor creates many patients
+    doctorPatients: {
+      forward: {
+        on: "doctors",
         has: "many",
-        label: "linkedGuestUsers",
+        label: "patients",
+      },
+      reverse: {
+        on: "patients",
+        has: "one",
+        label: "createdByDoctor",
+      },
+    },
+    // patients have only one and unique health card
+    patientHealthCard: {
+      forward: {
+        on: "patients",
+        has: "one",
+        label: "healthCard",
+        onDelete: "cascade",
+      },
+      reverse: {
+        on: "healthCard",
+        has: "one",
+        label: "patient",
       },
     },
   },
@@ -63,10 +102,15 @@ const _schema = i.schema({
     healthCard: {
       presence: i.entity({}),
     },
+    hospitals: {
+      presence: i.entity({}),
+    },
+    doctors: {
+      presence: i.entity({}),
+    },
   },
 });
 
-// This helps Typescript display nicer intellisense
 type _AppSchema = typeof _schema;
 interface AppSchema extends _AppSchema {}
 const schema: AppSchema = _schema;
