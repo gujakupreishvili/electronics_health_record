@@ -47,7 +47,7 @@ export const updatePatientInformation = async (id: string, info: any) => {
 export const updateDoctorInformation = async (id: string, info: any) => {
   try {
     if (!id) return;
-    
+
     await db.transact(
       db.tx.doctors[id].update({
         ...info,

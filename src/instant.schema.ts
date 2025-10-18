@@ -18,6 +18,7 @@ const _schema = i.schema({
       fullName: i.string(),
       specialty: i.string(),
       email: i.string().unique().indexed(),
+      password: i.string(),
       phoneNumber: i.string(),
       hospitalId: i.string().indexed(),
       createdAt: i.date(),
@@ -59,7 +60,6 @@ const _schema = i.schema({
         on: "hospitals",
         has: "many",
         label: "doctors",
-        onDelete: "cascade",
       },
       reverse: {
         on: "doctors",

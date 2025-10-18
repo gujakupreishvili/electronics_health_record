@@ -10,9 +10,9 @@ type CreateUserT = {
   weight: number;
   martialStatus: string;
   phoneNumber: string;
-  dateOfBirth: Date;
+  dateOfBirth: string;
   createdByDoctorId: string;
-  createdAt: Date;
+  createdAt: string;
 };
 
 export const dbCreatePatient = async ({
@@ -48,11 +48,11 @@ export const dbCreatePatient = async ({
 type HealthCardT = {
   patientId: string;
   cardNumber: string;
-  medicalCardCreationDate?: Date;
+  medicalCardCreationDate?: string;
   clinicHospitalName?: string;
   location: string;
   responsibleDoctorFullName: string;
-  hospitalizationDateTime: Date;
+  hospitalizationDateTime: string;
   referralSource: string;
   chiefComplaints: string;
   finalClinicalDiagnosisMain: string;
@@ -121,15 +121,16 @@ type CreateDoctorT = {
   fullName: string;
   specialty: string;
   email: string;
+  password: string;
   phoneNumber: string;
   hospitalId: string;
-  createdAt: Date;
+  createdAt: string;
 };
 
-export const createDoctor = (info: CreateDoctorT) => {
+export const dbCreateDoctor = async (info: CreateDoctorT) => {
   try {
     db.transact(db.tx.doctors[id()].create(info));
   } catch (error) {
-    console.error(error);
+    console.error(error, "error when creating Doctor");
   }
 };

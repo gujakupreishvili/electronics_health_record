@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 
-export const deletePatient = async (id: string) => {
+export const dbDeletePatient = async (id: string) => {
   try {
     if (!id) return;
 
@@ -10,7 +10,7 @@ export const deletePatient = async (id: string) => {
   }
 };
 
-export const deletePatientHistoryItem = (id: string) => {
+export const dbDeletePatientHistoryItem = (id: string) => {
   try {
     if (!id) return;
 
@@ -20,7 +20,7 @@ export const deletePatientHistoryItem = (id: string) => {
   }
 };
 
-export const deleteDoctor = async (id: string) => {
+export const dbDeleteDoctor = async (id: string) => {
   try {
     if (!id) return;
 
