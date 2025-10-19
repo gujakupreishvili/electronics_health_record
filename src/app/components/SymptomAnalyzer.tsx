@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { db } from "@/lib/db";
 import { Analysis } from "../types";
-import React from "react";
 import { useParams } from "next/navigation";
+import React from "react";
 
 export default function SymptomAnalyzer() {
   const [personalId, setPersonalId] = useState("");
@@ -14,6 +14,10 @@ export default function SymptomAnalyzer() {
   const [error, setError] = useState("");
   const params = useParams();
   const doctorId = params.moreAbout as string;
+
+  useEffect(() => {
+    if (doctorId) setPersonalId(doctorId);
+  }, [doctorId]);
 
   const {
     isLoading: fetchingPatient,
@@ -28,9 +32,24 @@ export default function SymptomAnalyzer() {
 
   useEffect(() => {
     if (data?.patients?.[0]) {
+      const { healthCard, id, dateOfBirth, createdAt, ...patientOnly } =
+        data.patients[0];
+
+      // Clean healthCard
+      let cleanHealthCard = null;
+      if (healthCard) {
+        const {
+          id,
+          createdByDoctorId,
+          createdByHospitalId,
+          patientId,
+          ...rest
+        } = healthCard;
+        cleanHealthCard = rest;
+      }
       setPatientData({
-        patient: data.patients[0],
-        healthCard: data.patients[0].healthCard,
+        patient: patientOnly,
+        healthCard: cleanHealthCard,
       });
       setError("");
     } else if (fetchError) {
@@ -46,15 +65,9 @@ export default function SymptomAnalyzer() {
   }, [data, personalId, fetchError]);
 
   const handleAnalyze = async () => {
-    if (!patientData) {
-      setError("ჯერ მოძებნეთ პაციენტი");
-      return;
-    }
-
-    if (!symptoms.trim()) {
-      setError("გთხოვთ აღწეროთ ამჟამინდელი სიმპტომები");
-      return;
-    }
+    if (!patientData) return setError("ჯერ მოძებნეთ პაციენტი");
+    if (!symptoms.trim())
+      return setError("გთხოვთ აღწეროთ ამჟამინდელი სიმპტომები");
 
     setLoading(true);
     setError("");
@@ -68,6 +81,7 @@ export default function SymptomAnalyzer() {
           patientData: patientData.patient,
           healthCard: patientData.healthCard,
           currentSymptoms: symptoms.trim(),
+          doctorId,
         }),
       });
 
@@ -90,6 +104,12 @@ export default function SymptomAnalyzer() {
     }
   };
 
+  const renderValue = (value: any) => {
+    if (value === null || value === undefined) return "არ არის შეყვანილი";
+    if (typeof value === "object") return JSON.stringify(value, null, 2);
+    return value.toString();
+  };
+
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
       <h1>ხელოვნური ინტელექტის სიმპტომების ანალიზის ასისტენტი</h1>
@@ -107,11 +127,16 @@ export default function SymptomAnalyzer() {
             <strong>პაციენტის პირადი ნომერი:</strong>
             <input
               type="text"
-              value={personalId} // 👈 ეს შეიცვალა doctorId-ზე personalId-დ
-              onChange={(e) => setPersonalId(e.target.value)} // ინახავს სწორად state-ში
-              placeholder="შეიყვანეთ 11-ნიშნა პირადი ნომერი"
-              style={{ marginLeft: "10px", padding: "8px", width: "300px" }}
-              maxLength={11}
+              value={personalId}
+              readOnly
+              placeholder="პირადი ნომერი იტვირთება..."
+              style={{
+                marginLeft: "10px",
+                padding: "8px",
+                width: "300px",
+                backgroundColor: "#f0f0f0",
+                cursor: "not-allowed",
+              }}
             />
           </label>
           {fetchingPatient && (
@@ -129,57 +154,24 @@ export default function SymptomAnalyzer() {
               borderRadius: "5px",
             }}
           >
-            <p>
-              <strong>სახელი:</strong> {patientData.patient.fullName}
-            </p>
-            <p>
-              <strong>ასაკი:</strong> {patientData.patient.age} წელი
-            </p>
-            <p>
-              <strong>სქესი:</strong> {patientData.patient.sex}
-            </p>
-            <p>
-              <strong>წონა:</strong> {patientData.patient.weight} კგ
-            </p>
-            <p>
-              <strong>სიმაღლე:</strong> {patientData.patient.height} სმ
-            </p>
-            <p>
-              <strong>მობილურის ნომერი:</strong>{" "}
-              {patientData.patient.phoneNumber}
-            </p>
-            <p>
-              <strong>ოჯახური მდგომარეობა:</strong>{" "}
-              {patientData.patient.martialStatus}
-            </p>
+            <h3>პაციენტის ინფორმაცია</h3>
+            {Object.entries(patientData.patient).map(([key, value]) => (
+              <p key={key}>
+                <strong>{key}:</strong> {renderValue(value)}
+              </p>
+            ))}
 
             <hr style={{ margin: "15px 0", borderTop: "1px solid #c3e6cb" }} />
             <h4 style={{ marginBottom: "5px", color: "#258a3d" }}>
-              📋 ჯანმრთელობის ბარათის ინფორმაცია (ისტორია)
+              📋 ჯანმრთელობის ბარათის ინფორმაცია
             </h4>
 
             {patientData.healthCard ? (
-              <>
-                <p>
-                  <strong>ბარათის ნომერი:</strong>{" "}
-                  {patientData.healthCard.cardNumber}
+              Object.entries(patientData.healthCard).map(([key, value]) => (
+                <p key={key}>
+                  <strong>{key}:</strong> {renderValue(value)}
                 </p>
-                <p>
-                  <strong>ძირითადი საჩივრები (ისტორია):</strong>{" "}
-                  {patientData.healthCard.chiefComplaints ||
-                    "არ არის შეყვანილი"}
-                </p>
-                <p>
-                  <strong>ბოლო კლინიკური დიაგნოზი:</strong>{" "}
-                  {patientData.healthCard.finalClinicalDiagnosisMain ||
-                    "არ არის ჩაწერილი"}
-                </p>
-                <p>
-                  <strong>პასუხისმგებელი ექიმი:</strong>{" "}
-                  {patientData.healthCard.responsibleDoctorFullName ||
-                    "უცნობია"}
-                </p>
-              </>
+              ))
             ) : (
               <p style={{ color: "red", fontWeight: "bold" }}>
                 ⚠️ ამ პაციენტისთვის ჯანმრთელობის ბარათი არ არის შექმნილი.
@@ -258,7 +250,7 @@ export default function SymptomAnalyzer() {
           <h2 style={{ color: "#28a745", marginBottom: "15px" }}>
             🤖 AI ანალიზის შედეგები
           </h2>
-          <div
+          <pre
             style={{
               whiteSpace: "pre-wrap",
               lineHeight: "1.6",
@@ -266,7 +258,7 @@ export default function SymptomAnalyzer() {
             }}
           >
             {analysis.text}
-          </div>
+          </pre>
           <div
             style={{
               marginTop: "15px",
