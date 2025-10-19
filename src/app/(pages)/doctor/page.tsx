@@ -49,7 +49,7 @@ export default function DoctorContext() {
 
   return (
     <>
-      <Header />
+      <Header variant="Logout" />
       <div className="flex flex-col px-[10px] md:px-[40px] pt-[30px] ">
         {/* Header Section */}
         <div className="w-full flex items-center justify-between">
