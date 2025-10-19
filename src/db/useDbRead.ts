@@ -45,8 +45,8 @@ export const useDbRead = <T extends TRoomNameSpace>({
 
 export const useGetDoctorByPersonalId = (id: string) => {
   const { result } = useDbRead({
-    query: { doctors: { $: { where: { doctorId: id } } } },
-    roomNameSpace: RoleInstances.DOCTORS,
+    query: { patients: { $: { where: { id: id } } } },
+    roomNameSpace: RoleInstances.PATIENTS,
   });
 
   return { result };

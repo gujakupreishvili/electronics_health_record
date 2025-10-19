@@ -38,7 +38,6 @@ const _schema = i.schema({
     }),
     healthCard: i.entity({
       patientId: i.string().unique().indexed(),
-      cardNumber: i.string().unique().indexed(),
       medicalCardCreationDate: i.date(),
       createdByDoctorId: i.string().indexed(),
       createdByHospitalId: i.string().indexed(),
@@ -46,11 +45,12 @@ const _schema = i.schema({
       location: i.string(),
       responsibleDoctorFullName: i.string(),
       hospitalizationDateTime: i.date(),
-      referralSource: i.string(),
-      chiefComplaints: i.string(),
       finalClinicalDiagnosisMain: i.string(),
-      doctorNotes: i.json().optional(), // [{doctorId, doctorName, hospitalId, hospitalName, note, date}]
-      auditTrail: i.json().optional(), // [{doctorId, hospitalId, action, date, changedFields}]
+      doctorNotes: i.string().optional(),
+      statusPraesense: i.string().optional(),
+      statusLocus: i.string().optional(),
+      corsusMorbis: i.string().optional(),
+      clinicDischarge: i.string().optional(),
     }),
   },
   links: {

@@ -1,32 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 
-export const useDbCheckUserCredentials = ({
-  email,
-  password,
-}: {
+type CheckUserParams = {
   email: string;
   password: string;
-}) => {
-  const { data } = db.useQuery({ doctors: { $: { where: { email } } } });
+};
+
+export const useDbCheckUserCredentials = () => {
   const [user, setUser] = useState<{} | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const verify = async () => {
-      if (!data?.doctors[0]) return setError("User not found");
-      const user = data.doctors[0];
-      console.log(user.password, "user");
+  const checkUser = async ({ email, password }: CheckUserParams) => {
+    setError(null);
+    setUser(null);
+    try {
+      const { data } = await db.queryOnce({
+        doctors: { $: { where: { email } } },
+      });
 
-      const isValid = await bcrypt.compare(password, user.password);
-      if (!isValid) return setError("Invalid credentials");
+      if (!data?.doctors[0]) {
+        setError("User not found");
+        return null;
+      }
 
-      setUser(user);
-    };
+      const foundUser = data.doctors[0];
 
-    if (email && password) verify();
-  }, [data, email, password]);
+      const isValid = await bcrypt.compare(password, foundUser.password);
 
-  return { user, error };
+      if (!isValid) {
+        setError("Invalid credentials");
+        return null;
+      }
+
+      setUser(foundUser);
+      return foundUser;
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong");
+      return null;
+    }
+  };
+
+  return { user, error, checkUser };
 };
