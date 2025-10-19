@@ -43,7 +43,7 @@ export default function DoctorContext() {
     );
   }, [result, userId]);
 
-  const handleClick = (productId: number) => {
+  const handleClick = (productId:string) => {
     router.push(`/moreAbout/${productId}`);
   };
 
@@ -89,7 +89,7 @@ export default function DoctorContext() {
             {Array.isArray(filteredPatients) && filteredPatients.length > 0 ? (
               filteredPatients.map((item: Patient) => (
                 <PatientComponent
-                  onClick={() => handleClick(item.id)}
+                  onClick={() => handleClick(item.personalId)}
                   key={item.id}
                   patient={item}
                 />

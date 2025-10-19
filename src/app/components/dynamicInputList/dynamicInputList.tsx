@@ -1,10 +1,8 @@
 "use client";
 import React from "react";
-import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import Button from "@/components/button/button";
 import * as Yup from "yup";
-import { FaPlus } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 import { dbCreateHealthCard } from "@/db";
 
 // ✅ Validation Schema
@@ -59,9 +57,9 @@ const onSubmit = (
   values: PatientFormValues,
   { resetForm }: { resetForm: () => void }
 ) => {
-  console.log(values);
+  console.log(values, "dsadjhbasdjhbashd");
   dbCreateHealthCard(values);
-  resetForm();
+  // resetForm();
 };
 export default function PatientForm() {
   return (
@@ -207,34 +205,6 @@ export default function PatientForm() {
             />
           </div>
 
-          {/* referralSource */}
-          <div>
-            <Field
-              name="referralSource"
-              placeholder="რეფერალის წყარო"
-              className="border px-3 py-2 rounded-md w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <ErrorMessage
-              name="referralSource"
-              component="div"
-              className="text-red-500 text-xs mt-1"
-            />
-          </div>
-
-          {/* chiefComplaints */}
-          <div>
-            <Field
-              as="textarea"
-              name="chiefComplaints"
-              placeholder="პაციენტის საჩივრები"
-              className="border px-3 py-2 rounded-md w-full h-[80px] resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <ErrorMessage
-              name="chiefComplaints"
-              component="div"
-              className="text-red-500 text-xs mt-1"
-            />
-          </div>
           {/* statusPraesense */}
           <div>
             <Field
@@ -273,7 +243,6 @@ export default function PatientForm() {
 
           {/* Submit */}
           <Button
-            // type="submit"
             text="შენახვა"
             className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 duration-300"
           />

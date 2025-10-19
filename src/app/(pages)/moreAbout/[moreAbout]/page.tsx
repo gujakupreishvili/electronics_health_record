@@ -45,12 +45,19 @@ export default function MoreAbout() {
     roomNameSpace: RoleInstances.HEALTHCARD,
   });
 
+  console.log(fetchedData, "fitst");
+
   const userData =
     Array.isArray(fetchedData) &&
-    fetchedData.filter((item: HealthCardWithIdT) => item.id === doctorId);
+    fetchedData.filter(
+      (item: HealthCardWithIdT) => item.patientId === doctorId
+    );
 
   console.log(userData, "fetchdata");
-
+  
+  const onClick = (id: number) => {
+    console.log(id,"idd")
+  }
 
   return (
     <>
@@ -59,10 +66,11 @@ export default function MoreAbout() {
         <p className=" py-[20px] text-[22px] font-semibold">
           პაციენტის პროფილი
         </p>
-        <div className="bg-gray-100 flex flex-col rounded-[8px] px-[30px] py-[30px]">
+        <div className="bg-gray-100 flex flex-col rounded-[8px] px-[30px] py-[30px] ">
           {result && result.length > 0 ? (
             result.map((item) => (
               <div
+              onClick={() => onClick(item.id)}
                 key={item.id}
                 className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2"
               >
@@ -102,49 +110,65 @@ export default function MoreAbout() {
             <p>ინფორმაცია ვერ მოიძებნა</p>
           )}
           {/* პაციენტის ისტორია */}
-          <section className="flex flex-col mt-6">
-  <h1 className="text-[22px] font-semibold mb-4">პაციენტის ისტორია</h1>
-  
-  {userData && userData.length > 0 ? (
-    userData.map((item: HealthCardWithIdT) => (
-      <div
-        key={item.id}
-        className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2 bg-gray-50 p-4 rounded-md shadow-sm"
-      >
-        <p>
-          კლინიკის/საავადმყოფოს სახელი: <span>{item.clinicHospitalName}</span>
-        </p>
-        <p>
-          პაციენტის ID: <span>{item.patientId}</span>
-        </p>
-        <p>
-          ადგილი: <span>{item.location}</span>
-        </p>
-        <p>
-          მიმღები ექიმი: <span>{item.responsibleDoctorFullName}</span>
-        </p>
-        <p>
-          ჰოსპიტალიზაციის თარიღი:{" "}
-          <span>{new Date(item.hospitalizationDateTime).toLocaleDateString("ka-GE")}</span>
-        </p>
-        <p>
-          საბოლოო კლინიკური დიაგნოზი: <span>{item.finalClinicalDiagnosisMain}</span>
-        </p>
-        {item.doctorNotes && item.doctorNotes.length > 0 && (
-          <p>
-            ექიმის შენიშვნები: <span>{item.doctorNotes}</span>
-          </p>
-        )}
-        {item.statusPraesense && <p>სტატუსის წარმოშობა: {item.statusPraesense}</p>}
-        {item.statusLocus && <p>სტატუსის ადგილმდებარეობა: {item.statusLocus}</p>}
-        {item.corsusMorbis && <p>მორბის მიმდინარეობა: {item.corsusMorbis}</p>}
-        {item.clinicDischarge && <p>კლინიკის გამოსვლა: {item.clinicDischarge}</p>}
-      </div>
-    ))
-  ) : (
-    <p>ისტორია ვერ მოიძებნა</p>
-  )}
-</section>
+            <h1 className="text-[22px] font-semibold mb-[0px] mt-[20px]">
+              პაციენტის ისტორია
+            </h1>
+          <section className="flex flex-col mt-6 h-[90px] overflow-auto  mb-[20px]">
+
+            {userData && userData.length > 0 ? (
+              userData.map((item: HealthCardWithIdT) => (
+                <div
+                  key={item.id}
+                  className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2 bg-gray-50 p-4 rounded-md shadow-sm"
+                >
+                  <p>
+                    კლინიკის/საავადმყოფოს სახელი:{" "}
+                    <span>{item.clinicHospitalName}</span>
+                  </p>
+                  <p>
+                    პაციენტის ID: <span>{item.patientId}</span>
+                  </p>
+                  {/* <p> */}
+                    {/* ადგილი: <span>{item.location}</span>
+                  </p>
+                  <p>
+                    მიმღები ექიმი: <span>{item.responsibleDoctorFullName}</span>
+                  </p>
+                  <p>
+                    ჰოსპიტალიზაციის თარიღი:{" "}
+                    <span>
+                      {new Date(
+                        item.hospitalizationDateTime
+                      ).toLocaleDateString("ka-GE")}
+                    </span>
+                  </p>
+                  <p>
+                    საბოლოო კლინიკური დიაგნოზი:{" "}
+                    <span>{item.finalClinicalDiagnosisMain}</span>
+                  </p>
+                  {item.doctorNotes && item.doctorNotes.length > 0 && (
+                    <p>
+                      ექიმის შენიშვნები: <span>{item.doctorNotes}</span>
+                    </p>
+                  )}
+                  {item.statusPraesense && (
+                    <p>სტატუსის წარმოშობა: {item.statusPraesense}</p>
+                  )}
+                  {item.statusLocus && (
+                    <p>სტატუსის ადგილმდებარეობა: {item.statusLocus}</p>
+                  )}
+                  {item.corsusMorbis && (
+                    <p>მორბის მიმდინარეობა: {item.corsusMorbis}</p>
+                  )}
+                  {item.clinicDischarge && (
+                    <p>კლინიკის გამოსვლა: {item.clinicDischarge}</p>
+                  )} */}
+                </div>
+              ))
+            ) : (
+              <p>ისტორია ვერ მოიძებნა</p>
+            )}
+          </section>
 
           <DynamicInputList />
           <Button
