@@ -1,29 +1,49 @@
-
+"use client";
 import React from "react";
-import { FieldHookConfig, useField } from "formik";
+import { useField } from "formik";
 
-type InputProps = {
+interface InputProps {
   label: string;
-} & React.InputHTMLAttributes<HTMLInputElement> & FieldHookConfig<string>;
+  name: string;
+  type?: string;
+  placeholder?: string;
+}
 
-export default function Input({ label, ...props }: InputProps) {
-  const [field, meta] = useField(props);
+const Input = ({ label, name, type = "text", placeholder }: InputProps) => {
+  const [field, meta] = useField(name);
+
+  const inputClass =
+    "w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm";
 
   return (
-    <div className="flex flex-col gap-[4px]">
-      <label htmlFor={props.id || props.name} className="font-semibold">
+    <div className="flex flex-col gap-1">
+      <label htmlFor={name} className="text-sm font-medium text-gray-700">
         {label}
       </label>
-      <input
-        {...field}
-        {...props}
-        className={`border border-gray-300 rounded-[6px] p-[10px] focus:outline-none ${
-          meta.touched && meta.error ? "border-red-500" : ""
-        }`}
-      />
-      {meta.touched && meta.error ? (
-        <p className="text-red-500 text-sm">{meta.error}</p>
-      ) : null}
+
+      {type === "textarea" ? (
+        <textarea
+          id={name}
+          {...field}
+          placeholder={placeholder}
+          className={`${inputClass} min-h-[100px] resize-none`}
+        />
+      ) : (
+        <input
+          id={name}
+          type={type}
+          {...field}
+          value={field.value || ""}
+          placeholder={placeholder}
+          className={inputClass}
+        />
+      )}
+
+      {meta.touched && meta.error && (
+        <span className="text-red-500 text-xs">{meta.error}</span>
+      )}
     </div>
   );
-}
+};
+
+export default Input;
