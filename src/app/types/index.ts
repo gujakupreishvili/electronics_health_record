@@ -27,3 +27,17 @@ export interface Analysis {
   clarifyingQuestions: string[];
   urgencyLevel: "low" | "moderate" | "urgent";
 }
+export interface Analysis {
+  patientSummary?: string;
+  differentialDiagnosis: DifferentialDiagnosis[];
+  suggestedTests: string[];
+  redFlags: string[];
+  clarifyingQuestions: string[];
+  urgencyLevel: "low" | "moderate" | "urgent";
+}
+
+export interface AnalysisRequest {
+  patientData: any;
+  healthCard: any;
+  currentSymptoms: string;
+}

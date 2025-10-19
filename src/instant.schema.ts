@@ -49,12 +49,11 @@ const _schema = i.schema({
       referralSource: i.string(),
       chiefComplaints: i.string(),
       finalClinicalDiagnosisMain: i.string(),
-      doctorNotes: i.json().optional(), // [{doctorId, doctorName, hospitalId, hospitalName, note, date}]
-      auditTrail: i.json().optional(), // [{doctorId, hospitalId, action, date, changedFields}]
+      doctorNotes: i.json().optional(),
+      auditTrail: i.json().optional(),
     }),
   },
   links: {
-    // one hospital has many doctors
     hospitalDoctors: {
       forward: {
         on: "hospitals",
@@ -67,7 +66,6 @@ const _schema = i.schema({
         label: "hospital",
       },
     },
-    // doctor creates many patients
     doctorPatients: {
       forward: {
         on: "doctors",
@@ -80,7 +78,6 @@ const _schema = i.schema({
         label: "createdByDoctor",
       },
     },
-    // patients have only one and unique health card
     patientHealthCard: {
       forward: {
         on: "patients",
