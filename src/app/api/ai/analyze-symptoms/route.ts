@@ -1,10 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
-// 🚨 IMPORTANT: Change this to process.env.GOOGLE_API_KEY (without NEXT_PUBLIC_)
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_API_KEY!);
 
-// Helper function to format doctor notes
 function formatDoctorNotes(notes: any[]): string {
   if (!notes || notes.length === 0) return "არ არის ჩანაწერები";
 
@@ -23,7 +21,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { patientData, healthCard, currentSymptoms } = body;
 
-    // Validate required fields
     if (!patientData || !currentSymptoms?.trim()) {
       return NextResponse.json(
         {
@@ -34,7 +31,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Build comprehensive medical history
     const medicalHistory = [];
     if (healthCard?.chiefComplaints) {
       medicalHistory.push(`ძირითადი საჩივრები: ${healthCard.chiefComplaints}`);
@@ -45,7 +41,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Extract medications from doctor notes if available
     const doctorNotesText = formatDoctorNotes(healthCard?.doctorNotes || []);
 
     const prompt = `You are a medical assistant helping doctors in Georgia. Answer in Georgian.
@@ -112,7 +107,6 @@ ${currentSymptoms}
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
 
-    // Extract JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 
     if (!jsonMatch) {
@@ -128,7 +122,6 @@ ${currentSymptoms}
 
     const analysis = JSON.parse(jsonMatch[0]);
 
-    // Validate response structure
     if (!analysis.differentialDiagnosis || !analysis.urgencyLevel) {
       return NextResponse.json(
         {
