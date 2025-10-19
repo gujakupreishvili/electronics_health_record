@@ -3,7 +3,7 @@ import {
   updateDoctorInformation,
   updatePatientInformation,
 } from "./dbUpdate";
-import { useDbRead } from "./useDbRead";
+import { useDbRead, useGetDoctorByPersonalId } from "./useDbRead";
 import {
   dbDeleteDoctor,
   dbDeletePatientHistoryItem,
@@ -28,4 +28,5 @@ export {
   dbCreateHealthCard,
   dbCreatePatient,
   useDbCheckUserCredentials,
+  useGetDoctorByPersonalId,
 };

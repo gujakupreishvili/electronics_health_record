@@ -1,10 +1,11 @@
+import { RoleInstances } from "@/constants/roleEnum";
 import { AppSchema } from "@/instant.schema";
 import { db } from "@/lib/db";
 import { UpdateParams } from "@instantdb/react";
 
 export const updateHealthCard = async (
   id: string,
-  info: UpdateParams<AppSchema, "healthCard">
+  info: UpdateParams<AppSchema, RoleInstances.HEALTHCARD>
 ) => {
   try {
     if (!id) return;
@@ -21,7 +22,7 @@ export const updateHealthCard = async (
 
 export const updatePatientInformation = async (
   id: string,
-  info: UpdateParams<AppSchema, "patients">
+  info: UpdateParams<AppSchema, RoleInstances.PATIENTS>
 ) => {
   try {
     if (!id) return;
@@ -38,7 +39,7 @@ export const updatePatientInformation = async (
 
 export const updateDoctorInformation = async (
   id: string,
-  info: UpdateParams<AppSchema, "doctors">
+  info: UpdateParams<AppSchema, RoleInstances.DOCTORS>
 ) => {
   try {
     if (!id) return;

@@ -1,6 +1,10 @@
+import { RoleInstances } from "@/constants/roleEnum";
 import { db } from "@/lib/db";
 
-type TRoomNameSpace = "healthCard" | "patients" | "doctors";
+type TRoomNameSpace =
+  | RoleInstances.HEALTHCARD
+  | RoleInstances.PATIENTS
+  | RoleInstances.DOCTORS;
 
 type readDataT<T extends TRoomNameSpace> = {
   roomNameSpace: T;
@@ -15,14 +19,13 @@ export const useDbRead = <T extends TRoomNameSpace>({
 
   // Adjust query to match the expected shape for db.useQuery
   const queryParam =
-    roomNameSpace === "patients"
+    roomNameSpace === RoleInstances.PATIENTS
       ? { patients: query[roomNameSpace] }
-      : roomNameSpace === "healthCard"
+      : roomNameSpace === RoleInstances.HEALTHCARD
       ? { healthCard: query[roomNameSpace] }
-      : roomNameSpace === "doctors"
+      : roomNameSpace === RoleInstances.DOCTORS
       ? { doctors: query[roomNameSpace] }
       : {};
-
 
   const { isLoading, error, data } = db.useQuery(queryParam);
   const { peers } = db.rooms.usePresence(room);
@@ -38,4 +41,13 @@ export const useDbRead = <T extends TRoomNameSpace>({
     isLoading,
     error: error?.message ?? null,
   };
+};
+
+export const useGetDoctorByPersonalId = (id: string) => {
+  const { result } = useDbRead({
+    query: { doctors: { $: { where: { doctorId: id } } } },
+    roomNameSpace: RoleInstances.DOCTORS,
+  });
+
+  return { result };
 };
