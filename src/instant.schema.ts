@@ -54,7 +54,6 @@ const _schema = i.schema({
     }),
   },
   links: {
-    // one hospital has many doctors
     hospitalDoctors: {
       forward: {
         on: "hospitals",
@@ -67,7 +66,6 @@ const _schema = i.schema({
         label: "hospital",
       },
     },
-    // doctor creates many patients
     doctorPatients: {
       forward: {
         on: "doctors",
@@ -80,7 +78,6 @@ const _schema = i.schema({
         label: "createdByDoctor",
       },
     },
-    // patients have only one and unique health card
     patientHealthCard: {
       forward: {
         on: "patients",
