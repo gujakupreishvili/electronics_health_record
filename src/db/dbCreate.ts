@@ -64,19 +64,6 @@ export type HealthCardT = {
 };
 
 export const dbCreateHealthCard = (info: HealthCardT) => {
-  const {
-    patientId,
-    medicalCardCreationDate,
-    clinicHospitalName,
-    location,
-    responsibleDoctorFullName,
-    hospitalizationDateTime,
-    finalClinicalDiagnosisMain,
-    doctorNotes,
-    createdByDoctorId,
-    createdByHospitalId,
-  } = info;
-
   // Ensure required fields are present and default to empty string if undefined
 
   db.transact(db.tx.healthCard[id()].create(info));

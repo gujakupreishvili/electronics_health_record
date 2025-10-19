@@ -2,15 +2,14 @@
 
 import { useDbRead, useGetDoctorByPersonalId } from "@/db";
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Header from "@/components/header/header";
 import Button from "@/components/button/button";
 import { LuSparkles } from "react-icons/lu";
 import DynamicInputList from "@/components/dynamicInputList/dynamicInputList";
 import { RoleInstances } from "@/constants/roleEnum";
-import { UpdateParams } from "@instantdb/react";
-import { AppSchema } from "@/instant.schema";
-import { dbCreateHealthCard, HealthCardT } from "@/db/dbCreate";
+import { HealthCardT } from "@/db/dbCreate";
+
 import SymptomAnalyzer from "@/components/SymptomAnalyzer";
 type Patient = {
   id: number;
@@ -33,10 +32,9 @@ interface HealthCardWithIdT extends HealthCardT {
 
 export default function MoreAbout() {
   const [checkAi, setCheckAi] = useState(false);
+  const [isModal, setIsModal] = useState(false);
   const params = useParams();
   const doctorId = params.moreAbout as string;
-
-  console.log("Doctor ID:", doctorId);
 
   const { result } = useGetDoctorByPersonalId(doctorId) as {
     result: Patient[];
@@ -47,18 +45,20 @@ export default function MoreAbout() {
     roomNameSpace: RoleInstances.HEALTHCARD,
   });
 
-  console.log(fetchedData, "fitst");
-
   const userData =
     Array.isArray(fetchedData) &&
     fetchedData.filter(
       (item: HealthCardWithIdT) => item.patientId === doctorId
     );
 
-  console.log(userData, "fetchdata");
+  const onClick = (id: string) => {
+    const pdfModalData =
+      Array.isArray(fetchedData) &&
+      fetchedData.filter((item: HealthCardWithIdT) => item.id === id);
 
-  const onClick = (id: number) => {
-    console.log(id, "idd");
+    if (pdfModalData) {
+      setIsModal(true);
+    }
   };
 
   return (
@@ -68,11 +68,10 @@ export default function MoreAbout() {
         <p className=" py-[20px] text-[22px] font-semibold">
           პაციენტის პროფილი
         </p>
-        <div className="bg-gray-100 flex flex-col rounded-[8px] px-[30px] py-[30px] ">
+        <div className="bg-gray-100 flex flex-col rounded-[8px] px-[30px] py-[30px]">
           {result && result.length > 0 ? (
             result.map((item) => (
               <div
-                onClick={() => onClick(item.id)}
                 key={item.id}
                 className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2"
               >
@@ -115,12 +114,14 @@ export default function MoreAbout() {
           <h1 className="text-[22px] font-semibold mb-[0px] mt-[20px]">
             პაციენტის ისტორია
           </h1>
-          <section className="flex flex-col mt-6 h-[90px] overflow-auto  mb-[20px]">
+
+          <section className="flex flex-col mt-6 h-[260px] overflow-y-auto  mb-[20px]">
             {userData && userData.length > 0 ? (
               userData.map((item: HealthCardWithIdT) => (
                 <div
+                  onClick={() => onClick(item.id)}
                   key={item.id}
-                  className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2 bg-gray-50 p-4 rounded-md shadow-sm"
+                  className={`mb-4 grid grid-cols-2 gap-x-3 gap-y-2 bg-gray-50 p-4 rounded-md shadow-sm pointer`}
                 >
                   <p>
                     კლინიკის/საავადმყოფოს სახელი:{" "}
@@ -129,8 +130,8 @@ export default function MoreAbout() {
                   <p>
                     პაციენტის ID: <span>{item.patientId}</span>
                   </p>
-                  {/* <p> */}
-                  {/* ადგილი: <span>{item.location}</span>
+                  <p>
+                    ადგილი: <span>{item.location}</span>
                   </p>
                   <p>
                     მიმღები ექიმი: <span>{item.responsibleDoctorFullName}</span>
@@ -163,7 +164,7 @@ export default function MoreAbout() {
                   )}
                   {item.clinicDischarge && (
                     <p>კლინიკის გამოსვლა: {item.clinicDischarge}</p>
-                  )} */}
+                  )}
                 </div>
               ))
             ) : (
