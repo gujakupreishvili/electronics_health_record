@@ -15,6 +15,12 @@ export default function SymptomAnalyzer() {
   const params = useParams();
   const doctorId = params.moreAbout as string;
 
+  useEffect(() => {
+    if (doctorId) {
+      setPersonalId(doctorId);
+    }
+  }, [doctorId]);
+
   const {
     isLoading: fetchingPatient,
     error: fetchError,
@@ -68,6 +74,7 @@ export default function SymptomAnalyzer() {
           patientData: patientData.patient,
           healthCard: patientData.healthCard,
           currentSymptoms: symptoms.trim(),
+          doctorId,
         }),
       });
 
@@ -107,11 +114,16 @@ export default function SymptomAnalyzer() {
             <strong>პაციენტის პირადი ნომერი:</strong>
             <input
               type="text"
-              value={personalId} // 👈 ეს შეიცვალა doctorId-ზე personalId-დ
-              onChange={(e) => setPersonalId(e.target.value)} // ინახავს სწორად state-ში
-              placeholder="შეიყვანეთ 11-ნიშნა პირადი ნომერი"
-              style={{ marginLeft: "10px", padding: "8px", width: "300px" }}
-              maxLength={11}
+              value={personalId}
+              readOnly
+              placeholder="პირადი ნომერი იტვირთება..."
+              style={{
+                marginLeft: "10px",
+                padding: "8px",
+                width: "300px",
+                backgroundColor: "#f0f0f0",
+                cursor: "not-allowed",
+              }}
             />
           </label>
           {fetchingPatient && (
@@ -160,10 +172,6 @@ export default function SymptomAnalyzer() {
 
             {patientData.healthCard ? (
               <>
-                <p>
-                  <strong>ბარათის ნომერი:</strong>{" "}
-                  {patientData.healthCard.cardNumber}
-                </p>
                 <p>
                   <strong>ძირითადი საჩივრები (ისტორია):</strong>{" "}
                   {patientData.healthCard.chiefComplaints ||
