@@ -1,7 +1,7 @@
 "use client";
 
 import { useDbRead, useGetDoctorByPersonalId } from "@/db";
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import Header from "@/components/header/header";
 import Button from "@/components/button/button";
@@ -11,6 +11,7 @@ import { RoleInstances } from "@/constants/roleEnum";
 import { UpdateParams } from "@instantdb/react";
 import { AppSchema } from "@/instant.schema";
 import { dbCreateHealthCard, HealthCardT } from "@/db/dbCreate";
+import SymptomAnalyzer from "@/components/SymptomAnalyzer";
 type Patient = {
   id: number;
   fullName: string;
@@ -31,6 +32,7 @@ interface HealthCardWithIdT extends HealthCardT {
 }
 
 export default function MoreAbout() {
+  const [checkAi, setCheckAi] = useState(false);
   const params = useParams();
   const doctorId = params.moreAbout as string;
 
@@ -54,10 +56,10 @@ export default function MoreAbout() {
     );
 
   console.log(userData, "fetchdata");
-  
+
   const onClick = (id: number) => {
-    console.log(id,"idd")
-  }
+    console.log(id, "idd");
+  };
 
   return (
     <>
@@ -70,7 +72,7 @@ export default function MoreAbout() {
           {result && result.length > 0 ? (
             result.map((item) => (
               <div
-              onClick={() => onClick(item.id)}
+                onClick={() => onClick(item.id)}
                 key={item.id}
                 className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2"
               >
@@ -110,11 +112,10 @@ export default function MoreAbout() {
             <p>ინფორმაცია ვერ მოიძებნა</p>
           )}
           {/* პაციენტის ისტორია */}
-            <h1 className="text-[22px] font-semibold mb-[0px] mt-[20px]">
-              პაციენტის ისტორია
-            </h1>
+          <h1 className="text-[22px] font-semibold mb-[0px] mt-[20px]">
+            პაციენტის ისტორია
+          </h1>
           <section className="flex flex-col mt-6 h-[90px] overflow-auto  mb-[20px]">
-
             {userData && userData.length > 0 ? (
               userData.map((item: HealthCardWithIdT) => (
                 <div
@@ -129,7 +130,7 @@ export default function MoreAbout() {
                     პაციენტის ID: <span>{item.patientId}</span>
                   </p>
                   {/* <p> */}
-                    {/* ადგილი: <span>{item.location}</span>
+                  {/* ადგილი: <span>{item.location}</span>
                   </p>
                   <p>
                     მიმღები ექიმი: <span>{item.responsibleDoctorFullName}</span>
@@ -172,10 +173,12 @@ export default function MoreAbout() {
 
           <DynamicInputList />
           <Button
+            onClick={() => setCheckAi(true)}
             icon={LuSparkles}
             text="ხელოვნური ინტელექტი"
             className="flex items-center hover:bg-gray-300 duration-500 justify-center py-[10px] border-[1px] border-gray-200 hover:border-gray-300 bg-gray-200 rounded-[8px] px-[8px] mt-[10px] mb-[5px] gap-[8px]"
           />
+          {checkAi && <SymptomAnalyzer />}
         </div>
       </div>
     </>

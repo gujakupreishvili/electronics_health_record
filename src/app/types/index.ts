@@ -25,6 +25,8 @@ export interface Analysis {
   suggestedTests: string[];
   redFlags: string[];
   clarifyingQuestions: string[];
+  text: any;
+  timestamp: any;
   urgencyLevel: "low" | "moderate" | "urgent";
 }
 export interface Analysis {

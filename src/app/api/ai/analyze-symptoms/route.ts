@@ -1,149 +1,145 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_API_KEY!);
+const genAI = new GoogleGenerativeAI(process.env.AI_KEY!);
 
-function formatDoctorNotes(notes: any[]): string {
-  if (!notes || notes.length === 0) return "არ არის ჩანაწერები";
+function formatDoctorNotes(notes: any): string {
+  if (!notes) {
+    return "ექიმის ჩანაწერები არ არის ხელმისაწვდომი";
+  }
 
-  return notes
-    .map(
-      (note: any, i: number) =>
-        `${i + 1}. ${new Date(note.date).toLocaleDateString("ka-GE")}: ${
-          note.note
-        } (ექიმი: ${note.doctorName})`
-    )
-    .join("\n");
+  if (typeof notes === "string") {
+    return notes;
+  }
+
+  if (typeof notes === "object" && !Array.isArray(notes)) {
+    if (notes.date && notes.note) {
+      return `${new Date(notes.date).toLocaleDateString("ka-GE")}: ${
+        notes.note
+      }`;
+    }
+    return JSON.stringify(notes, null, 2);
+  }
+
+  if (Array.isArray(notes)) {
+    if (notes.length === 0) {
+      return "ექიმის ჩანაწერები ჯერ არ არის დამატებული";
+    }
+    return notes
+      .map(
+        (note: any, i: number) =>
+          `${i + 1}. ${new Date(note.date).toLocaleDateString("ka-GE")}: ${
+            note.note
+          }`
+      )
+      .join("\n");
+  }
+
+  return "ექიმის ჩანაწერები არასწორი ფორმატით არის";
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const { patientData, healthCard, currentSymptoms } = body;
-
-    if (!patientData || !currentSymptoms?.trim()) {
+    if (!process.env.AI_KEY) {
       return NextResponse.json(
         {
           success: false,
-          error: "Patient data and current symptoms are required",
+          error: "GEMINI_API_KEY არ არის კონფიგურირებული",
+        },
+        { status: 500 }
+      );
+    }
+
+    const { patientData, healthCard, currentSymptoms } = await req.json();
+
+    if (!patientData || !currentSymptoms) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "პაციენტის მონაცემები ან სიმპტომები არ არის მითითებული",
         },
         { status: 400 }
       );
     }
 
-    const medicalHistory = [];
-    if (healthCard?.chiefComplaints) {
-      medicalHistory.push(`ძირითადი საჩივრები: ${healthCard.chiefComplaints}`);
-    }
-    if (healthCard?.finalClinicalDiagnosisMain) {
-      medicalHistory.push(
-        `ბოლო დიაგნოზი: ${healthCard.finalClinicalDiagnosisMain}`
-      );
-    }
+    console.log("doctorNotes type:", typeof healthCard?.doctorNotes);
+    console.log("doctorNotes value:", healthCard?.doctorNotes);
 
-    const doctorNotesText = formatDoctorNotes(healthCard?.doctorNotes || []);
+    const formattedNotes = healthCard?.doctorNotes
+      ? formatDoctorNotes(healthCard.doctorNotes)
+      : "ექიმის ჩანაწერები არ არის ხელმისაწვდომი";
 
-    const prompt = `You are a medical assistant helping doctors in Georgia. Answer in Georgian.
+    const prompt = `თქვენ ხართ გამოცდილი ექიმი-დიაგნოსტიკოსი. გაანალიზეთ პაციენტის სიმპტომები და სამედიცინო ისტორია.
 
-პაციენტის სრული ინფორმაცია:
+პაციენტის ინფორმაცია:
 - სახელი: ${patientData.fullName}
 - ასაკი: ${patientData.age} წელი
 - სქესი: ${patientData.sex}
-- სიმაღლე: ${patientData.height} სმ
 - წონა: ${patientData.weight} კგ
-- BMI: ${(patientData.weight / (patientData.height / 100) ** 2).toFixed(1)}
-- დაბადების თარიღი: ${new Date(patientData.dateOfBirth).toLocaleDateString(
-      "ka-GE"
-    )}
-- ოჯახური მდგომარეობა: ${patientData.martialStatus}
+- სიმაღლე: ${patientData.height} სმ
 
-სამედიცინო ისტორია (ჯანმრთელობის ბარათიდან):
-${
-  medicalHistory.length > 0 ? medicalHistory.join("\n") : "არ არის წინა ისტორია"
-}
+სამედიცინო ისტორია:
+- ძირითადი საჩივრები (ისტორია): ${healthCard?.chiefComplaints || "არ არის"}
+- ბოლო დიაგნოზი: ${healthCard?.finalClinicalDiagnosisMain || "არ არის"}
+- ექიმის ჩანაწერები:
+${formattedNotes}
 
-ექიმის წინა ჩანაწერები:
-${doctorNotesText}
-
-ამჟამინდელი სიმპტომები (რაც აწუხებს ახლა):
+ამჟამინდელი სიმპტომები:
 ${currentSymptoms}
 
-გთხოვთ გააკეთოთ შემდეგი:
+გთხოვთ უპასუხოთ ქართულად და მოგვაწოდოთ:
 
-1. პაციენტის ჯანმრთელობის მდგომარეობის მოკლე შეჯამება (patientSummary) - გაითვალისწინეთ მისი ასაკი, წონა, ისტორია და ახლანდელი სიმპტომები
+1. შესაძლო დიაგნოზები (სიმძიმის მიხედვით დალაგებული)
+2. რეკომენდებული გამოკვლევები
+3. რისკის ფაქტორები
+4. გადაუდებელი სამედიცინო ნიშნები (თუ არსებობს)
 
-2. მიუთითეთ 5 ყველაზე შესაძლო მდგომარეობა (differentialDiagnosis) პაციენტის ისტორიისა და ამჟამინდელი სიმპტომების გათვალისწინებით
+გთხოვთ იყოთ კონკრეტული და პროფესიონალური.`;
 
-3. რეკომენდირებული სამედიცინო ტესტები (suggestedTests)
+    // Try multiple model names in order
+    const modelNames = [
+      "gemini-2.0-flash-exp",
+      "gemini-1.5-pro-latest",
+      "gemini-1.5-flash-latest",
+      "gemini-pro",
+    ];
 
-4. გამაფრთხილებელი ნიშნები რომლებიც საჭიროებს გადაუდებელ ყურადღებას (redFlags)
+    let analysisText = "";
+    let lastError = null;
 
-5. დამატებითი შეკითხვები პაციენტისთვის (clarifyingQuestions)
-
-6. გადაუდებლობის დონე: "low", "moderate", ან "urgent" (urgencyLevel)
-
-ᲛᲜᲘᲨᲕᲜᲔᲚᲝᲕᲐᲜᲘ: 
-- ეს არის ექიმის დამხმარე ინსტრუმენტი
-- საბოლოო დიაგნოზს აძლევს ექიმი
-- გაითვალისწინეთ პაციენტის ასაკი და წინა ისტორია რეკომენდაციებში
-
-უპასუხეთ ᲛᲮᲝᲚᲝᲓ ამ JSON ფორმატში (არანაირი დამატებითი ტექსტი):
-{
-  "patientSummary": "პაციენტის მდგომარეობის მოკლე შეჯამება",
-  "differentialDiagnosis": [
-    {
-      "condition": "დაავადების სახელი",
-      "likelihood": "85%",
-      "reasoning": "მოკლე ახსნა რატომ არის ეს შესაძლო"
-    }
-  ],
-  "suggestedTests": ["ტესტი 1", "ტესტი 2"],
-  "redFlags": ["გამაფრთხილებელი ნიშანი 1"],
-  "clarifyingQuestions": ["შეკითხვა 1"],
-  "urgencyLevel": "low"
-}`;
-
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-
-    if (!jsonMatch) {
-      console.error("Failed to parse AI response:", responseText);
-      return NextResponse.json(
-        {
-          success: false,
-          error: "AI response format error. Please try again.",
-        },
-        { status: 500 }
-      );
+    for (const modelName of modelNames) {
+      try {
+        console.log(`Trying model: ${modelName}`);
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        analysisText = response.text();
+        console.log(`✅ Success with model: ${modelName}`);
+        break; // Success, exit loop
+      } catch (error: any) {
+        console.log(`❌ Failed with ${modelName}:`, error.message);
+        lastError = error;
+        continue; // Try next model
+      }
     }
 
-    const analysis = JSON.parse(jsonMatch[0]);
-
-    if (!analysis.differentialDiagnosis || !analysis.urgencyLevel) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Incomplete AI analysis. Please try again.",
-        },
-        { status: 500 }
-      );
+    if (!analysisText) {
+      throw lastError || new Error("ყველა მოდელი ვერ მუშაობს");
     }
 
     return NextResponse.json({
       success: true,
-      analysis,
-      rawResponse: responseText,
+      analysis: {
+        text: analysisText,
+        timestamp: new Date().toISOString(),
+      },
     });
   } catch (error) {
-    console.error("API Error:", error);
+    console.error("Analysis error:", error);
     return NextResponse.json(
       {
         success: false,
-        error:
-          error instanceof Error ? error.message : "Unknown error occurred",
+        error: error instanceof Error ? error.message : "უცნობი შეცდომა",
       },
       { status: 500 }
     );

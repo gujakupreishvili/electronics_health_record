@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "@/lib/db";
 import { Analysis } from "../types";
 import React from "react";
+import { useParams } from "next/navigation";
 
 export default function SymptomAnalyzer() {
   const [personalId, setPersonalId] = useState("");
@@ -11,6 +12,8 @@ export default function SymptomAnalyzer() {
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const params = useParams();
+  const doctorId = params.moreAbout as string;
 
   const {
     isLoading: fetchingPatient,
@@ -23,7 +26,7 @@ export default function SymptomAnalyzer() {
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (data?.patients?.[0]) {
       setPatientData({
         patient: data.patients[0],
@@ -90,6 +93,7 @@ export default function SymptomAnalyzer() {
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
       <h1>ხელოვნური ინტელექტის სიმპტომების ანალიზის ასისტენტი</h1>
+
       <div
         style={{
           marginBottom: "30px",
@@ -98,14 +102,13 @@ export default function SymptomAnalyzer() {
           borderRadius: "8px",
         }}
       >
-        <h2>ნაბიჯი 1: პაციენტის პირადი ნომერი</h2>
         <div style={{ marginBottom: "20px" }}>
           <label>
-            <strong>პირადი ნომერი:</strong>
+            <strong>პაციენტის პირადი ნომერი:</strong>
             <input
               type="text"
-              value={personalId}
-              onChange={(e) => setPersonalId(e.target.value)}
+              value={personalId} // 👈 ეს შეიცვალა doctorId-ზე personalId-დ
+              onChange={(e) => setPersonalId(e.target.value)} // ინახავს სწორად state-ში
               placeholder="შეიყვანეთ 11-ნიშნა პირადი ნომერი"
               style={{ marginLeft: "10px", padding: "8px", width: "300px" }}
               maxLength={11}
@@ -126,7 +129,6 @@ export default function SymptomAnalyzer() {
               borderRadius: "5px",
             }}
           >
-            <h3>✅ პაციენტი ნაპოვნია</h3>
             <p>
               <strong>სახელი:</strong> {patientData.patient.fullName}
             </p>
@@ -157,7 +159,7 @@ export default function SymptomAnalyzer() {
             </h4>
 
             {patientData.healthCard ? (
-              <React.Fragment>
+              <>
                 <p>
                   <strong>ბარათის ნომერი:</strong>{" "}
                   {patientData.healthCard.cardNumber}
@@ -177,7 +179,7 @@ export default function SymptomAnalyzer() {
                   {patientData.healthCard.responsibleDoctorFullName ||
                     "უცნობია"}
                 </p>
-              </React.Fragment>
+              </>
             ) : (
               <p style={{ color: "red", fontWeight: "bold" }}>
                 ⚠️ ამ პაციენტისთვის ჯანმრთელობის ბარათი არ არის შექმნილი.
@@ -243,7 +245,42 @@ export default function SymptomAnalyzer() {
         </div>
       )}
 
-      {analysis && <div></div>}
+      {analysis && (
+        <div
+          style={{
+            marginTop: "30px",
+            padding: "20px",
+            border: "2px solid #28a745",
+            borderRadius: "8px",
+            backgroundColor: "#f8f9fa",
+          }}
+        >
+          <h2 style={{ color: "#28a745", marginBottom: "15px" }}>
+            🤖 AI ანალიზის შედეგები
+          </h2>
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              lineHeight: "1.6",
+              fontFamily: "sans-serif",
+            }}
+          >
+            {analysis.text}
+          </div>
+          <div
+            style={{
+              marginTop: "15px",
+              fontSize: "12px",
+              color: "#6c757d",
+              borderTop: "1px solid #dee2e6",
+              paddingTop: "10px",
+            }}
+          >
+            <strong>ანალიზის დრო:</strong>{" "}
+            {new Date(analysis.timestamp).toLocaleString("ka-GE")}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
