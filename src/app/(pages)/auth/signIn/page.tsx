@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import ChoseRole from "@/components/choseRole/choseRole";
 import { Building2, Shield, Stethoscope } from "lucide-react";
 import Header from "@/components/header/header";
-import { Form, Formik, FormikHelpers } from "formik";
+import { Form, Formik } from "formik";
 import { SignInValidationSchema } from "@/app/utils/validation/signInValidationSchemta";
-import axios from "axios";
 import Input from "@/components/input/input";
+import { db } from "@/lib/db";
+import bcrypt from "bcryptjs";
+import { useRouter } from "next/navigation";
 
 type SignInValues = {
   email: string;
@@ -22,10 +24,13 @@ export default function Auth() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const handleSubmit = async (
-    values: SignInValues,
-    { setErrors }: FormikHelpers<SignInValues>
-  ) => {
+  const router = useRouter();
+
+  const { data } = db.useQuery({
+    doctors: {},
+  });
+
+  const handleSubmit = async (values: SignInValues) => {
     if (!selectedRole) {
       setServerError("გთხოვთ აირჩიოთ თქვენი როლი.");
       return;
@@ -37,21 +42,30 @@ export default function Auth() {
         role: selectedRole,
       };
 
-      // const res = await axios.post("/api/login", payload);
-      console.log(values, "values");
+      const foundUser = data?.doctors.filter(
+        (item) => item.email === payload.email
+      );
+
+      if (!foundUser) return;
+
+      const isValid = await bcrypt.compare(
+        payload.password,
+        foundUser[0].password
+      );
+
+      if (!isValid) {
+        setServerError("პარილი არასწორია.");
+        return;
+      }
+
+      setServerError("");
+      router.push("/doctor");
       console.log("რეგისტრაცია წარმატებით:", payload);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.data?.errors) {
-          setErrors(error.response.data.errors);
-        }
-        setServerError("დაფიქსირდა შეცდომა. სცადეთ თავიდან.");
-      } else {
-        setServerError("უცნობი შეცდომა მოხდა.");
-      }
+      console.log(error);
+      setServerError("უცნობი შეცდომა მოხდა.");
     }
   };
-
   return (
     <>
       <Header />

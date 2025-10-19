@@ -5,6 +5,7 @@ import { Formik, Form } from "formik";
 import { AddPatientValidationSchema } from "@/app/utils/validation/addPatientValidationSchema";
 import { X } from "lucide-react";
 import Input from "@/components/input/input";
+import { dbCreatePatient } from "@/db";
 type AddPatientProps = {
   setAddPatient: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -13,20 +14,23 @@ export default function AddPatient({ setAddPatient }: AddPatientProps) {
   const initialValues = {
     personalId: "",
     fullName: "",
-    age: "",
+    age: 0,
     sex: "",
-    height: "",
-    weight: "",
+    height: 0,
+    weight: 0,
     martialStatus: "",
     phoneNumber: "",
     dateOfBirth: "",
     createdByDoctorId: "",
     createdAt: "",
   };
+  
 
   const handleSubmit = (values: typeof initialValues) => {
-    console.log("Submitted patient:", values);
+    dbCreatePatient(values);
+    setAddPatient(false)
   };
+
 
   return (
     <div className="flex items-center justify-center p-4">

@@ -3,7 +3,7 @@ import React from "react";
 import { useField } from "formik";
 
 interface InputProps {
-  label: string;
+  label?: string;
   name: string;
   type?: string;
   placeholder?: string;

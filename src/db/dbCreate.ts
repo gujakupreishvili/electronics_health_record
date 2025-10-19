@@ -46,33 +46,31 @@ export const dbCreatePatient = async ({
   );
 };
 
-type HealthCardT = {
+export type HealthCardT = {
   patientId: string;
-  cardNumber: string;
-  medicalCardCreationDate?: string;
-  clinicHospitalName?: string;
+  medicalCardCreationDate: string;
+  clinicHospitalName: string;
   location: string;
   responsibleDoctorFullName: string;
   hospitalizationDateTime: string;
-  referralSource: string;
-  chiefComplaints: string;
   finalClinicalDiagnosisMain: string;
-  doctorNotes: string[];
+  doctorNotes: string;
   createdByDoctorId: string;
   createdByHospitalId: string;
+  statusPraesense?: string;
+  statusLocus?: string;
+  corsusMorbis?: string;
+  clinicDischarge?: string;
 };
 
 export const dbCreateHealthCard = (info: HealthCardT) => {
   const {
     patientId,
-    cardNumber,
     medicalCardCreationDate,
     clinicHospitalName,
     location,
     responsibleDoctorFullName,
     hospitalizationDateTime,
-    referralSource,
-    chiefComplaints,
     finalClinicalDiagnosisMain,
     doctorNotes,
     createdByDoctorId,
@@ -80,41 +78,8 @@ export const dbCreateHealthCard = (info: HealthCardT) => {
   } = info;
 
   // Ensure required fields are present and default to empty string if undefined
-  if (
-    !patientId ||
-    !cardNumber ||
-    !medicalCardCreationDate ||
-    !clinicHospitalName ||
-    !location ||
-    !responsibleDoctorFullName ||
-    !hospitalizationDateTime ||
-    !referralSource ||
-    !chiefComplaints ||
-    !finalClinicalDiagnosisMain ||
-    !createdByDoctorId ||
-    !createdByHospitalId
-  ) {
-    console.error("");
-    return;
-  }
 
-  db.transact(
-    db.tx.healthCard[id()].create({
-      patientId: patientId,
-      cardNumber: cardNumber,
-      medicalCardCreationDate: medicalCardCreationDate,
-      clinicHospitalName: clinicHospitalName,
-      location: location,
-      responsibleDoctorFullName: responsibleDoctorFullName,
-      hospitalizationDateTime: hospitalizationDateTime,
-      referralSource: referralSource,
-      chiefComplaints: chiefComplaints,
-      finalClinicalDiagnosisMain: finalClinicalDiagnosisMain,
-      doctorNotes: doctorNotes ?? [],
-      createdByDoctorId,
-      createdByHospitalId,
-    })
-  );
+  db.transact(db.tx.healthCard[id()].create(info));
 };
 
 type CreateDoctorT = {
